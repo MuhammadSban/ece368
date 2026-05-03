@@ -77,6 +77,10 @@ int List_Save_To_File(char *filename, Node *list)
 
 Node *List_Shellsort(Node *list, long *n_comp)
 {
+    if(list == NULL || list->next == NULL)
+    {
+        return list; //no need for sorting
+    }
     int sorts;
     //int i;
     int k;

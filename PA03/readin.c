@@ -111,6 +111,6 @@ void assignWidths(TreeNode *Root)
     assignWidths(Root->left);
     assignWidths(Root->right);
     
-    if(Root->left)  NodeAdds(Root, Root->left);
-    if(Root->right) NodeAdds(Root, Root->right);
+    if(Root->left != NULL)  NodeAdds(Root, Root->left);
+    if(Root->right != NULL) NodeAdds(Root, Root->right);
 }

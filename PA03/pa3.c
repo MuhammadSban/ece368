@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     rerootAB(&preread, &preread->right, 1, argv[3]);
 
     //long minSize = (long)(preread->x) * (long)(preread->y);
-    //findOptimalSubtree(&preread, &preread, &minSize, argv[4]);
+    long minSize = (long)(preread->x) * (long)(preread->y);
 
     assignWidths(preread);
     FILE *fptr = fopen(argv[4], "w");
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
         freeTreeIt(preread);
         return EXIT_FAILURE;
     }
-    newPrint(preread, fptr);
+    newPrint(preread, preread, fptr);
 
     fclose(fptr);
     freeTreeIt(preread);

@@ -1,8 +1,7 @@
 #include "readin.h"
 #include "writeout.h"
 #include "binarytree.h"
-
-#include <stdio.h>s
+#include <stdio.h>
 #include <stdlib.h>
 
 //TreeNode *makeTestTree(int length);

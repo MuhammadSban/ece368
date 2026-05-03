@@ -44,6 +44,7 @@ int Array_Save_To_File(char *filename, long *array, int size)
 
 void Array_Shellsort(long *array, int size, long *n_comp)
 {
+    if(size <= 1){return;} //no need for sorting
     int sorts; //length of 2p3q sequence for k-sorting
     int i; //generic counter
     int j; //generic counter

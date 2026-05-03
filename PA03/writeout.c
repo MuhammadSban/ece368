@@ -138,16 +138,30 @@ void freeTreeIt(TreeNode *bTree)
     }
 }
 
-void newPrint(TreeNode *curr, FILE *fptr)
+void newPrint(TreeNode *curr, TreeNode *root, FILE *fptr)
 {
     if(curr == NULL){return;}
-    if(curr->leaf == 0 && (curr->label == 'V' || curr->label == 'H'))
+    if(curr == root || curr == root->left || curr == root->right) //If it's the root or one of the two subtrees, print as cut
     {
-        fprintf(fptr, "%c(%d,%d)\n", curr->label, curr->width, curr->height);
+        if(curr->label == 'V' || curr->label == 'H')
+        {
+            fprintf(fptr, "%c\n", curr->label);
+        }
+        else
+        {
+            fprintf(fptr, "%d\n", curr->label);
+        }
     }
-    else{
-        fprintf(fptr, "%d(%d,%d)\n", curr->label, curr->width, curr->height);
-    }
-    newPrint(curr->left, fptr);
-    newPrint(curr->right, fptr);
+    else
+    {
+        if(curr->leaf == 0 && (curr->label == 'V' || curr->label == 'H'))
+        {
+            fprintf(fptr, "%c(%d,%d)\n", curr->label, curr->width, curr->height);
+        }
+        else{
+            fprintf(fptr, "%d(%d,%d)\n", curr->label, curr->width, curr->height);
+        }
+}
+    newPrint(curr->left, root, fptr);
+    newPrint(curr->right, root, fptr);
 }

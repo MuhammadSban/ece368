@@ -48,7 +48,6 @@ void rerootAB(TreeNode **root, TreeNode **focal, int dirtrav, char *writeFile)
         currSave->right = oldRoot->right;
         oldRoot->right = currSave;
         (*root) = oldRoot;
-
     }
 
 }
@@ -89,142 +88,71 @@ void resetCoords(TreeNode *root)
 //Add SAFE restoration and tracking for nodes
 //Pass left and right separately? Handle the unique cases 
 
-/*
-void findOptimalSubtree(TreeNode **root, TreeNode **focal, long *minSize, char *writeFile)
+void rdimPacking(TreeNode **root, TreeNode *focal, TreeNode *prev, int dirtrav, FILE *writeFile)
 {
-    if((*focal)->leaf == 1)
+    if(focal == NULL){return;}
+    if(focal == (*root) || focal == (*root)->right || focal == (*root)->left)
     {
-        return;
+    if(focal->leaf == 0)
+    {
+        fprintf(writeFile, "%c\n", focal->label, focal->width, focal->height);
+    }
+    else
+    {
+        fprintf(writeFile, "%d\n", focal->label, focal->width, focal->height);
+    }
+        rdimPacking(root, focal->left, focal, 0, writeFile);
+        rdimPacking(root, focal->right, focal, 1, writeFile);
     }
 
-    TreeNode *currSave = *focal;
-    TreeNode *oldRoot = *root;
+    //reroot according to dirtrav
 
-    TreeNode *oldRootR = (*root)->right;
-
-    *root = currSave;
-    oldRoot->left = currSave->left;
-    (*root)->left = oldRoot;
-
-    //update vals
-
-    coordSubtract(oldRoot, oldRoot->right, oldRoot->left);
-    coordAdds(oldRoot, currSave->left);
-
-    coordSubtract(*root, (*root)->right, oldRoot->left);
-    coordAdds(*root, oldRoot);
-
-    long leftArea = (long)(*root)->x * (long)(*root)->y;
-
-    currSave->left = oldRoot->left;
-    oldRoot->left = currSave;
-    (*root) = oldRoot;
-
-    //restore vals
-
-    coordSubtract(*root, (*root)->right, oldRoot);
-    coordAdds(*root, currSave);
-
-    coordSubtract(oldRoot, oldRoot->right, currSave->left);
-    coordAdds(oldRoot, currSave);
-
-
-    *root = currSave;
-    oldRoot->right = currSave->right;
-    (*root)->right = oldRoot;
-
-    //update vals
-
-    coordSubtract(oldRoot, oldRoot->left, oldRoot->right);
-    coordAdds(oldRoot, currSave->right);
-
-    coordSubtract(*root, (*root)->left, oldRoot->right);
-    coordAdds(*root, oldRoot);
-
-    long rightArea = (long)(*root)->x * (long)(*root)->y;
-
-    if(rightArea < leftArea && rightArea < *minSize)
+    TreeNode *currSave = prev;
+    long larea;
+    long rarea;
+    if(dirtrav == 1) //just went right, preserve right edge
     {
-        *minSize = rightArea;
-        findOptimalSubtree(root, &(currSave->left), minSize, writeFile);
-    }
-    else if(leftArea < rightArea && leftArea < *minSize)
-    {
-        *minSize = leftArea;
-        currSave->right = oldRoot->right;
-        oldRoot->right = oldRootR;
-        (*root) = oldRoot;
-        //restore vals
-        coordSubtract(*root, (*root)->left, oldRoot);
-        coordAdds(*root, currSave);
+        TreeNode *oldRoot = *root;
+        *root = currSave;
+        oldRoot->left = focal->left;
+        (*root)->left = oldRoot;
 
-        coordSubtract(oldRoot, oldRoot->left, currSave->right);
-        coordAdds(oldRoot, currSave);
-
-            //update vals
-
-        coordSubtract(oldRoot, oldRoot->right, oldRoot->left);
-        coordAdds(oldRoot, currSave->left);
-
-        coordSubtract(*root, (*root)->right, oldRoot->left);
-        coordAdds(*root, oldRoot);
+        rdimPacking(root, focal->left, focal, 0, writeFile);
+        rdimPacking(root, focal->right, focal, 1, writeFile);
 
         currSave->left = oldRoot->left;
         oldRoot->left = currSave;
         (*root) = oldRoot;
-        findOptimalSubtree(root, &(currSave->left), minSize, writeFile);
+
+    }
+    else //just went left, preserve left edge
+    {
+        TreeNode *oldRoot = *root;
+        *root = currSave;
+        oldRoot->right = currSave->right;
+        (*root)->right = oldRoot;
+
+        rerootAB(root, &(currSave->left), 0, writeFile);
+
+        currSave->right = oldRoot->right;
+        oldRoot->right = currSave;
+        (*root) = oldRoot;
+    }
+
+    //Solve for smallest room
+
+    //Print smallest room
+    if(focal->leaf == 0)
+    {
+        fprintf(writeFile, "%c(%d,%d)\n", focal->label, focal->width, focal->height);
     }
     else
     {
-        currSave->right = oldRoot->right;
-        oldRoot->right = oldRootR;
-        (*root) = oldRoot;
-        //restore vals
-        coordSubtract(*root, (*root)->left, oldRoot);
-        coordAdds(*root, currSave);
+        fprintf(writeFile, "%d(%d,%d)\n", focal->label, focal->width, focal->height);
+    }
+    //Restore and continue recursing
 
-        coordSubtract(oldRoot, oldRoot->left, currSave->right);
-        coordAdds(oldRoot, currSave);
-    }
-}
 
-void coordSubtract(TreeNode *Root, TreeNode *other, TreeNode *Second)
-{
-    if(Root->label == 'V')
-    {
-        Root->width -= Second->width;
-        if(Second->height > other->height)
-        {
-            Root->height = other->height;
-        }
-    }
-    else if(Root->label == 'H')
-    {
-        Root->height -= Second->height;
-        if(Second->width > other->width)
-        {
-            Root->width = other->width;
-        }
-    }
+    rdimPacking(root, focal->left, focal, 0, writeFile);
+    rdimPacking(root, focal->right, focal, 1, writeFile);
 }
-
-void coordAdds(TreeNode *Root, TreeNode *Second)
-{
-    if(Root->label == 'V')
-    {
-        Root->width += Second->width;
-        if(Second->height > Root->height)
-        {
-            Root->height = Second->height;
-        }
-    }
-    else if(Root->label == 'H')
-    {
-        Root->height += Second->height;
-        if(Second->width > Root->width)
-        {
-            Root->width = Second->width;
-        }
-    }
-}
-    */

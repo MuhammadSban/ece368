@@ -12,4 +12,4 @@ void detailedOut(FILE *stream, TreeNode *focal);
 
 void freeTreeIt(TreeNode *bTree);
 
-void newPrint(TreeNode *curr, FILE* fptr);
+void newPrint(TreeNode *curr, TreeNode *root, FILE *fptr);
